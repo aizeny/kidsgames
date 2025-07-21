@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Substitution Cipher Encryptor</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="caeser.html" class="nav-link" id="caesar-link">Caesar Cipher</a>
+      <!--<a href="vigenere.html" class="nav-link" id="vigenere-link">Vigenère Cipher</a>-->
+      <a href="substitution.html" class="nav-link" id="substitution-link">Substitution Cipher</a>
+    </div>
+  </nav>
+
+  <h2>Substitution Cipher Encryptor</h2>
+
+  <label for="inputText">Enter text to encrypt:</label>
+  <textarea id="inputText" rows="4" placeholder="Type your message here..."></textarea>
+
+  <label>Substitution Key (A → ?):</label>
+  <div class="grid" id="subGrid"></div>
+<div class="sub-controls">
+  <div class="caesar-group">
+    <label for="caesarShift">Shift:</label>
+    <input type="number" id="caesarShift" min="0" max="25" value="3" />
+    <button id="applyCaesar">Use Caesar Shift</button>
+  </div>
+
+  <div class="caesar-group">
+    <label for="reverseShift">Shift:</label>
+    <input type="number" id="reverseShift" min="0" max="25" value="0" />
+    <button id="applyReverse">Use Reverse Alphabet</button>
+  </div>
+  <div class="caesar-group">
+  <button id="randomizeBtn" >🎲 Random Key</button>
+  </div>
+  
+
+</div>
+
+
+  <label for="outputText">Encrypted output:</label>
+  <textarea id="outputText" rows="4" readonly></textarea>
+
+	<div class="button-row">
+	  <button id="goToBoxes" class="primary-btn">Go to Letter Boxes Page</button>
+	  <button id="goToTools" class="side-btn">Substitution letter page Tools</button>
+	</div>
+  <script>
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const subGrid = document.getElementById('subGrid');
+    const goToBoxes = document.getElementById('goToBoxes');
+
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const inputs = {};
+	
+	window.addEventListener('pageshow', updateOutput);
+
+    // Create 26 labeled input boxes
+    for (const letter of letters) {
+      const cell = document.createElement('div');
+      cell.className = 'sub-cell';
+
+      const label = document.createElement('label');
+      label.textContent = letter;
+
+      const input = document.createElement('input');
+      input.maxLength = 1;
+      inputs[letter] = input;
+
+      cell.appendChild(label);
+      cell.appendChild(input);
+      subGrid.appendChild(cell);
+    }
+
+    // Generate a random permutation of A-Z
+    function generateRandomKey() {
+      const alphabet = letters.split('');
+      for (let i = alphabet.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [alphabet[i], alphabet[j]] = [alphabet[j], alphabet[i]];
+      }
+      return alphabet;
+    }
+
+    // Fill input boxes with a random key
+    function fillRandomKey() {
+      const randomKey = generateRandomKey();
+      for (let i = 0; i < 26; i++) {
+        const letter = letters[i];
+        inputs[letter].value = randomKey[i];
+      }
+    }
+
+    // Build substitution map and detect duplicates
+    function getSubstitutionMap() {
+      const map = {};
+      const used = {};
+      let hasDuplicate = false;
+
+      // Reset input styles
+      for (const input of Object.values(inputs)) {
+        input.classList.remove('duplicate');
+      }
+
+      for (const letter of letters) {
+        const val = inputs[letter].value.toUpperCase();
+        if (val.match(/^[A-Z]$/)) {
+          map[letter] = val;
+          if (!used[val]) {
+            used[val] = [];
+          }
+          used[val].push(letter);
+        } else {
+          return null; // missing or invalid input
+        }
+      }
+
+      // Highlight duplicates
+      for (const val in used) {
+        if (used[val].length > 1) {
+          hasDuplicate = true;
+          for (const dupLetter of used[val]) {
+            inputs[dupLetter].classList.add('duplicate');
+          }
+        }
+      }
+
+      return hasDuplicate ? null : map;
+    }
+
+    // Encrypt using the substitution map
+    function encrypt(text, subMap) {
+      return text.split('').map(char => {
+        const isUpper = char >= 'A' && char <= 'Z';
+        const isLower = char >= 'a' && char <= 'z';
+        const upperChar = char.toUpperCase();
+
+        if (isUpper || isLower) {
+          const subChar = subMap[upperChar];
+          return isUpper ? subChar : subChar.toLowerCase();
+        } else {
+          return char;
+        }
+      }).join('');
+    }
+
+    // Update encrypted text
+    function updateOutput() {
+      const subMap = getSubstitutionMap();
+      const text = inputText.value;
+
+      if (subMap) {
+        outputText.value = encrypt(text, subMap);
+      } else {
+        outputText.value = '[Error: Invalid or duplicate substitution letters]';
+      }
+    }
+
+    // Attach event listeners
+    inputText.addEventListener('input', updateOutput);
+    for (const input of Object.values(inputs)) {
+      input.addEventListener('input', updateOutput);
+    }
+
+    goToBoxes.addEventListener('click', () => {
+      const subMap = getSubstitutionMap();
+      if (!subMap) {
+        alert('Please enter 26 unique valid letters (A–Z) in the substitution boxes.');
+        return;
+      }
+      const encrypted = encodeURIComponent(outputText.value);
+      window.location.href = `decode-helper.html?text=${encrypted}`;
+    });
+
+    // Highlight active nav link
+    const path = window.location.pathname;
+    if (path.includes('encryptor.html')) {
+      document.getElementById('caesar-link').classList.add('active');
+    } else if (path.includes('vigenere.html')) {
+      document.getElementById('vigenere-link').classList.add('active');
+    } else if (path.includes('substitution.html')) {
+      document.getElementById('substitution-link').classList.add('active');
+    }
+
+    document.getElementById("applyCaesar").addEventListener("click", () => {
+      const shift = parseInt(document.getElementById("caesarShift").value, 10) || 0;
+      for (let i = 0; i < 26; i++) {
+        const original = letters[i];
+        const shifted = letters[(i + shift) % 26];
+        inputs[original].value = shifted;
+      }
+      updateOutput();
+    });
+
+    document.getElementById("applyReverse").addEventListener("click", () => {
+      const shift = parseInt(document.getElementById("reverseShift").value, 10) || 0;
+      const reversed = letters.split('').reverse();
+      const shifted = reversed.slice(shift).concat(reversed.slice(0, shift));
+
+      for (let i = 0; i < 26; i++) {
+        const original = letters[i];
+        inputs[original].value = shifted[i];
+      }
+      updateOutput();
+    });
+
+	
+	goToTools.addEventListener('click', () => {
+      window.location.href = `letter-mapping-blank.html`;
+    });
+	function generateRandomKey() {
+	  const shuffled = [...letters];
+	  for (let i = shuffled.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+	  }
+	  return shuffled;
+	}
+
+	function fillRandomKey() {
+	  const key = generateRandomKey();
+	  for (let i = 0; i < letters.length; i++) {
+		inputs[letters[i]].value = key[i];
+	  }
+	  updateOutput();
+	}
+
+	document.getElementById('randomizeBtn').addEventListener('click', fillRandomKey);
+
+
+    // Initialize
+    fillRandomKey();
+    updateOutput();
+  </script>
+</body>
+</html>

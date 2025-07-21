@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cipher Tools Main Menu</title>
+   <link rel="stylesheet" href="styles.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap');
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 40px 20px;
+      background: #f5f7ff;
+      color: #333;
+      text-align: center;
+      min-height: 50vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 50px;
+      color: #4e54c8;
+      text-shadow: 1px 1px 3px rgba(78, 84, 200, 0.5);
+    }
+
+    .menu-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    a.button {
+      background: linear-gradient(135deg, #4e54c8, #8f94fb);
+      color: white;
+      font-weight: 700;
+      text-decoration: none;
+      padding: 22px 50px;
+      border-radius: 15px;
+      font-size: 1.3rem;
+      box-shadow: 0 10px 20px rgba(78, 84, 200, 0.3);
+      transition: background 0.35s ease, box-shadow 0.35s ease;
+      user-select: none;
+      min-width: 180px;
+      display: inline-block;
+    }
+
+    a.button:hover {
+      background: linear-gradient(135deg, #3b40b0, #6e73db);
+      box-shadow: 0 15px 30px rgba(58, 62, 177, 0.6);
+    }
+
+    a.button:active {
+      transform: scale(0.98);
+      box-shadow: 0 7px 15px rgba(58, 62, 177, 0.4);
+    }
+
+    @media (max-width: 520px) {
+      .menu-buttons {
+        flex-direction: column;
+        gap: 25px;
+      }
+      a.button {
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Cipher Tools Main Menu</h1>
+
+  <div class="menu-buttons">
+    <a href="caeser.html" class="button">Caesar Cipher</a>
+    <!--<a href="vigenere.html" class="nav-link" id="vigenere-link">Vigenère Cipher</a>-->
+    <a href="substitution.html" class="button">Substitution Cipher</a>
+  </div>
+
+<div class="instructions">
+  <h3>Suggested steps</h3>
+  <p>
+    1. Simple message (one sentence) with a known key - just decypher
+  </p>
+  <p>
+    2. Simple message (one sentences) with known decrypted word
+  </p>
+  <p>
+    3. A sort letter (starts with Dear XXX, and ends with " best, << new line >> name") with the word "I" or "a" in the middle (one letter words makes it easy to break).
+  </p>
+  <p>
+    4. A sort letter without a one letter word, but with the same letter structure.
+  </p>
+  <p>
+    5. Simple message (two/three sentences). Tell the kid that a specific word is somewhere in the text (preferably a word with some pattern/repeating letters).
+  </p>
+  <p>
+    6. Simple message (two/three sentences) and remove all spaces. Tell the kid that a specific word is somewhere in the text (preferably a word with some pattern/repeating letters).
+  </p>
+</div>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concentric Alphabet Circles</title>
+    <style>
+        html, body {
+            height: 100%; /* Make html and body take full viewport height */
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Control scrolling from the body level */
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center; /* Center circles horizontally */
+            align-items: center;     /* Center circles vertically */
+            position: relative;      /* Needed for absolutely positioned children */
+        }
+
+        #shift-control {
+            position: absolute; /* Position the textbox independently */
+            top: 30px;          /* 30px from the top */
+            left: 50%;          /* Center horizontally */
+            transform: translateX(-50%); /* Adjust for true centering */
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 10; /* Ensure it's above other elements */
+            background-color: #f0f0f0; /* Match body background to hide any overlap */
+            padding: 10px; /* Add some padding around the label/input */
+            border-radius: 5px;
+        }
+
+        #shift-input {
+            padding: 8px;
+            font-size: 1.1em;
+            width: 80px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .circle-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            border: 2px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: #333;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #outer-circle {
+            width: 600px; /* Restored to original size */
+            height: 600px; /* Restored to original size */
+            z-index: 1;
+            background-color: #e0e0e0;
+        }
+
+        #inner-circle {
+            width: 480px; /* Restored to original size */
+            height: 480px; /* Restored to original size */
+            z-index: 2;
+            background-color: #d0d0d0;
+            cursor: grab;
+            transition: transform 0.3s ease-out;
+        }
+
+        .letter {
+            position: absolute;
+            white-space: nowrap;
+            z-index: 3;
+        }
+
+        .radial-line {
+            position: absolute;
+            background-color: #666;
+            width: 1px;
+            transform-origin: center bottom;
+        }
+
+        .outer-line {
+            z-index: 0;
+        }
+
+        .inner-line {
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="shift-control">
+        <label for="shift-input">Shift:</label>
+        <input type="number" id="shift-input" min="0" max="25" value="0">
+    </div>
+
+    <div class="circle-container">
+        <div id="outer-circle" class="circle"></div>
+        <div id="inner-circle" class="circle"></div>
+    </div>
+
+    <script>
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const numLetters = alphabet.length;
+        const angleStep = 360 / numLetters;
+
+        const innerCircleElement = document.getElementById('inner-circle');
+        const shiftInput = document.getElementById('shift-input');
+
+        let isDragging = false;
+        let mouseRotationOffset = 0;
+        let currentCircleRotation = 0;
+
+        function updateShiftTextbox() {
+            let normalizedRotation = currentCircleRotation % 360;
+            if (normalizedRotation < 0) {
+                normalizedRotation += 360;
+            }
+
+            const shift = Math.round(normalizedRotation / angleStep);
+            shiftInput.value = shift % numLetters;
+        }
+
+        function createAlphabetCircle(circleElementId, circleDiameter, isInner = false) {
+            const circle = document.getElementById(circleElementId);
+            const letters = alphabet.split('');
+
+            const borderWidth = parseFloat(getComputedStyle(circle).borderWidth);
+            const contentRadius = (circleDiameter - (2 * borderWidth)) / 2;
+
+            const letterMarginFromEdge = isInner ? 10 : 5;
+
+            letters.forEach((letterChar, index) => {
+                const letterDiv = document.createElement('div');
+                letterDiv.classList.add('letter');
+                letterDiv.textContent = letterChar;
+
+                const fontSize = isInner ? 1.6 : 1.9;
+                letterDiv.style.fontSize = `${fontSize}em`;
+                circle.appendChild(letterDiv);
+
+                const letterWidth = letterDiv.offsetWidth;
+                const letterHeight = letterDiv.offsetHeight;
+
+                const placementRadius = contentRadius - (Math.max(letterWidth, letterHeight) / 2) - letterMarginFromEdge;
+
+                if (placementRadius < 0) {
+                    console.warn(`Letters too large for circle ${circleElementId}. Some letters might be cut off.`);
+                }
+
+                const letterAngle = index * angleStep;
+                const letterRadians = (letterAngle - 90) * (Math.PI / 180);
+
+                const xCenterRelative = placementRadius * Math.cos(letterRadians);
+                const yCenterRelative = placementRadius * Math.sin(letterRadians);
+
+                letterDiv.style.left = `${contentRadius + xCenterRelative - (letterWidth / 2)}px`;
+                letterDiv.style.top = `${contentRadius + yCenterRelative - (letterHeight / 2)}px`;
+
+                letterDiv.style.transform = `rotate(${letterAngle + 90}deg)`;
+            });
+
+            const lineHeight = contentRadius;
+
+            for (let i = 0; i < numLetters; i++) {
+                const lineDiv = document.createElement('div');
+                lineDiv.classList.add('radial-line');
+                lineDiv.style.height = `${lineHeight}px`;
+
+                lineDiv.style.left = `${contentRadius}px`;
+                lineDiv.style.top = `${contentRadius - lineHeight}px`;
+
+                const lineAngle = (i * angleStep) + (angleStep / 2) + 360/26/2;
+                lineDiv.style.transform = `rotate(${lineAngle + 90}deg)`;
+
+                if (isInner) {
+                    lineDiv.classList.add('inner-line');
+                } else {
+                    lineDiv.classList.add('outer-line');
+                }
+                circle.prepend(lineDiv);
+            }
+        }
+
+        const outerCircleElement = document.getElementById('outer-circle');
+
+        createAlphabetCircle('outer-circle', outerCircleElement.offsetWidth, false);
+        createAlphabetCircle('inner-circle', innerCircleElement.offsetWidth, true);
+
+        updateShiftTextbox();
+
+        innerCircleElement.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            innerCircleElement.style.cursor = 'grabbing';
+            innerCircleElement.style.transition = 'none';
+
+            const rect = innerCircleElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+
+            const mouseAngleAtClick = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            let currentRotationValue = 0;
+            const transformStyle = getComputedStyle(innerCircleElement).transform;
+            if (transformStyle !== 'none') {
+                const matrix = new DOMMatrixReadOnly(transformStyle);
+                currentRotationValue = Math.atan2(matrix.b, matrix.a) * (180 / Math.PI);
+            }
+
+            mouseRotationOffset = mouseAngleAtClick - currentRotationValue;
+            currentCircleRotation = currentRotationValue;
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+
+            const rect = innerCircleElement.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dx = e.clientX - centerX;
+            const dy = e.clientY - centerY;
+
+            const currentMouseAngle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+            currentCircleRotation = currentMouseAngle - mouseRotationOffset;
+            innerCircleElement.style.transform = `rotate(${currentCircleRotation}deg)`;
+
+            updateShiftTextbox();
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+            innerCircleElement.style.cursor = 'grab';
+
+            innerCircleElement.style.transition = 'transform 0.3s ease-out';
+
+            const currentStep = currentCircleRotation / angleStep;
+            const roundedStep = Math.round(currentStep);
+            const finalSnapTarget = roundedStep * angleStep;
+
+            innerCircleElement.style.transform = `rotate(${finalSnapTarget}deg)`;
+            currentCircleRotation = finalSnapTarget;
+
+            updateShiftTextbox();
+        });
+
+        shiftInput.addEventListener('change', (e) => {
+            let requestedShift = parseInt(e.target.value);
+
+            if (isNaN(requestedShift) || requestedShift < 0 || requestedShift >= numLetters) {
+                updateShiftTextbox();
+                alert(`Please enter a number between 0 and ${numLetters - 1}.`);
+                return;
+            }
+
+            const targetRotation = requestedShift * angleStep;
+
+            const potentialRotations = [
+                targetRotation,
+                targetRotation + 360,
+                targetRotation + (2 * 360),
+                targetRotation - 360,
+                targetRotation - (2 * 360)
+            ];
+            let closestRotation = potentialRotations[0];
+            let minDiff = Math.abs(currentCircleRotation - potentialRotations[0]);
+
+            for (let i = 1; i < potentialRotations.length; i++) {
+                const diff = Math.abs(currentCircleRotation - potentialRotations[i]);
+                if (diff < minDiff) {
+                    minDiff = diff;
+                    closestRotation = potentialRotations[i];
+                }
+            }
+
+            innerCircleElement.style.transition = 'transform 0.5s ease-in-out';
+            innerCircleElement.style.transform = `rotate(${closestRotation}deg)`;
+            currentCircleRotation = closestRotation;
+
+            updateShiftTextbox();
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Caesar Cipher Encryptor</title>
+    <link rel="stylesheet" href="styles.css" />
+  
+</head>
+<body>
+<nav class="navbar">
+  <div class="nav-container">
+    <a href="caeser.html" class="nav-link" id="caesar-link">Caesar Cipher</a>
+    <!--<a href="vigenere.html" class="nav-link" id="vigenere-link">Vigenère Cipher</a>-->
+    <a href="substitution.html" class="nav-link" id="substitution-link">Substitution Cipher</a>
+  </div>
+</nav>
+
+
+  <h2>Caesar Cipher Encryptor</h2>
+
+  <label for="inputText">Enter text to encrypt:</label>
+  <textarea id="inputText" rows="4" placeholder="Type your message here..."></textarea>
+
+  <label for="shift">Enter shift amount (number):</label>
+  <input type="number" id="shift" value="3" min="0" max="25" />
+
+  <label for="outputText">Encrypted output:</label>
+  <textarea id="outputText" rows="4" readonly></textarea>
+
+<div class="button-row">
+  <button id="goToBoxes" class="primary-btn">Go to Letter Boxes Page</button>
+  <button id="goToTools" class="side-btn">Offline (printable) Caesar Tool (external)</button>
+  <button id="goToWebTool" class="side-btn">Online Caesar Tool</button>
+</div>
+
+
+  <script>
+    const input = document.getElementById('inputText');
+    const shiftInput = document.getElementById('shift');
+    const output = document.getElementById('outputText');
+    const goToBoxes = document.getElementById('goToBoxes');
+	window.addEventListener('pageshow', updateOutput);
+
+
+    function caesarEncrypt(text, shift) {
+      return text.split('').map(char => {
+        const code = char.charCodeAt(0);
+        if (char >= 'A' && char <= 'Z') {
+          return String.fromCharCode(((code - 65 + shift) % 26) + 65);
+        } else if (char >= 'a' && char <= 'z') {
+          return String.fromCharCode(((code - 97 + shift) % 26) + 97);
+        } else {
+          return char;
+        }
+      }).join('');
+    }
+
+    function updateOutput() {
+      const text = input.value;
+      const shift = parseInt(shiftInput.value) || 0;
+      output.value = caesarEncrypt(text, shift);
+    }
+
+    input.addEventListener('input', updateOutput);
+    shiftInput.addEventListener('input', updateOutput);
+
+    goToBoxes.addEventListener('click', () => {
+      const encrypted = encodeURIComponent(output.value);
+      window.location.href = `decode-helper.html?text=${encrypted}`;
+    });
+
+	document.getElementById('goToTools').addEventListener('click', () => {
+	  window.open('https://www.sciencefromscientists.org/wp-content/uploads/2019/03/caesar-wheel-DIY.pdf', '_blank');
+	});
+	document.getElementById('goToWebTool').addEventListener('click', () => {
+	  window.open('caeser_helper_g.html', '_blank');
+	});
+
+  </script>
+
+</body>
+</html>

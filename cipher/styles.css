@@ -1,0 +1,337 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+/* --- Reset & base --- */
+body {
+  font-family: 'Montserrat', sans-serif;
+  max-width: 800px;
+  margin: 40px auto 80px;
+  padding: 20px 20px;
+  background: #fafbff;
+  color: #222;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,50,0.05);
+  line-height: 1.5;
+}
+h1 {
+  color: #4e54c8;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+h2 {
+  color: #4e54c8;
+  font-weight: 700;
+  margin-bottom: 10px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(78, 84, 200, 0.3);
+}
+
+label {
+  font-weight: 600;
+  display: block;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  font-size: 1.05rem;
+}
+
+textarea, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: 1.5px solid #ccc;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  font-family: 'Montserrat', sans-serif;
+  outline-offset: 2px;
+}
+
+textarea:focus, input[type="text"]:focus, input[type="number"]:focus {
+  border-color: #4e54c8;
+  box-shadow: 0 0 8px rgba(78, 84, 200, 0.3);
+  outline: none;
+}
+
+textarea[readonly] {
+  background-color: #f0f0f5;
+  cursor: default;
+  color: #555;
+}
+
+button {
+  display: block;
+  margin: 20px auto 0;
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  border: none;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 14px 40px;
+  border-radius: 15px;
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(78, 84, 200, 0.4);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  user-select: none;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #3b40b0, #6e73db);
+  box-shadow: 0 10px 25px rgba(58, 62, 177, 0.6);
+}
+
+button:active {
+  transform: scale(0.98);
+  box-shadow: 0 6px 12px rgba(58, 62, 177, 0.4);
+}
+
+/* --- Nav bar --- */
+.navbar {
+  background: linear-gradient(to right, #4e54c8, #8f94fb);
+  padding: 12px 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border-radius: 8px;
+}
+
+.nav-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.3s, color 0.3s;
+  user-select: none;
+  font-size: 1rem;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* --- Substitution grid --- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.sub-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sub-cell label {
+  font-size: 14px;
+  margin-bottom: 4px;
+  user-select: none;
+}
+
+.sub-cell input {
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  font-size: 18px;
+  text-transform: uppercase;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.3s, background-color 0.3s;
+}
+
+.sub-cell input.duplicate {
+  border-color: red;
+  background-color: #ffe5e5;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #4e54c8, #8f94fb);
+  border: none;
+  color: white;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 14px 36px;
+  border-radius: 15px;
+  cursor: pointer;
+  box-shadow: 0 8px 15px rgba(78, 84, 200, 0.4);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.primary-btn:hover {
+  background: linear-gradient(135deg, #3b40b0, #6e73db);
+}
+
+.primary-btn:active {
+  transform: scale(0.98);
+}
+
+/* Smaller, secondary button */
+.side-btn {
+  background: #e6e9ff;
+  color: #4e54c8;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 10px 16px;
+  border: 2px solid #8f94fb;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+
+.side-btn:hover {
+  background: #d4d9ff;
+  color: #333;
+}
+
+.instructions {
+  margin-top: 40px;
+  padding: 20px;
+  background-color: #f2f4ff;
+  border-left: 5px solid #4e54c8;
+  border-radius: 10px;
+  color: #333;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: left;  /* ✅ Align text content to the right */
+}
+
+.instructions h3 {
+  margin-top: 0;
+  color: #4e54c8;
+  font-size: 18px;
+  font-weight: bold;
+  
+}
+.sub-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.caesar-group {
+  display: flex;
+  align-items: baseline; /* Align label/input/button to the same vertical baseline */
+  gap: 8px;
+}
+
+
+
+.caesar-group label,
+.caesar-group input {
+  margin: 0;
+  height: 36px;
+  line-height: 36px;
+  font-size: 14px;
+}
+
+.caesar-group button {
+  margin: 0;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 14px;
+  line-height: normal; /* <– FIX */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.sub-controls input[type="number"] {
+  width: 60px;
+  padding: 8px;
+  font-size: 16px;
+  border-radius: 8px;
+  border: 1.5px solid #aaa;
+  text-align: center;
+}
+
+.sub-controls button {
+  background-color: #4e54c8;
+  color: white;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.sub-controls button:hover {
+  background-color: #3b40b0;
+}
+.grid-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.grid-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.sub-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 16px 0;
+  gap: 20px;
+}
+
+.control-groups {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.caesar-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.side-button {
+  font-size: 14px;
+  padding: 8px 14px;
+  background: #eceeff;
+  border: 1.5px solid #4e54c8;
+  color: #4e54c8;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.side-button:hover {
+  background: #d9ddff;
+}

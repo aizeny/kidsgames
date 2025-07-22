@@ -18,6 +18,15 @@
   </nav>
 
   <h2>Substitution Cipher Encryptor</h2>
+    <div class="language-switcher">
+      <label for="languageSelect">🌐 Language:</label>
+      <select id="languageSelect">
+        <option value="substitution.html" selected>English</option>
+        <option value="substitution-hebrew.html">עברית</option>
+        <option value="substitution-russian.html" >Русский</option>
+
+      </select>
+    </div>
 
   <label for="inputText">Enter text to encrypt:</label>
   <textarea id="inputText" rows="4" placeholder="Type your message here..."></textarea>
@@ -48,8 +57,8 @@
   <textarea id="outputText" rows="4" readonly></textarea>
 
 	<div class="button-row">
-	  <button id="goToBoxes" class="primary-btn">Go to Letter Boxes Page</button>
-	  <button id="goToTools" class="side-btn">Substitution letter page Tools</button>
+	  <button id="goToBoxes" class="primary-btn">Decoder Page</button>
+	 <!--<button id="goToTools" class="side-btn">Substitution letter page Tools</button>-->
 	</div>
   <script>
     const inputText = document.getElementById('inputText');
@@ -212,9 +221,9 @@
     });
 
 	
-	goToTools.addEventListener('click', () => {
-      window.location.href = `letter-mapping-blank.html`;
-    });
+	//goToTools.addEventListener('click', () => {
+    //  window.location.href = `letter-mapping-blank.html`;
+    //});
 	function generateRandomKey() {
 	  const shuffled = [...letters];
 	  for (let i = shuffled.length - 1; i > 0; i--) {
@@ -233,6 +242,16 @@
 	}
 
 	document.getElementById('randomizeBtn').addEventListener('click', fillRandomKey);
+    // Set selected language based on current page
+    const languageSelect = document.getElementById("languageSelect");
+    const currentPage = window.location.pathname.split("/").pop();
+    if (languageSelect) {
+      languageSelect.value = currentPage;
+
+      languageSelect.addEventListener("change", () => {
+        window.location.href = languageSelect.value;
+      });
+    }
 
 
     // Initialize

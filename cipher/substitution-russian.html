@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Шифр Подстановки – Русский</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8150869065682337"
+     crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="caeser.html" class="nav-link" id="caesar-link">Caesar Cipher</a>
+      <a href="substitution.html" class="nav-link" id="substitution-link">Substitution Cipher</a>
+    </div>
+  </nav>
+  
+  <h2>Шифр Подстановки – Русский</h2>
+
+  <div class="language-switcher">
+    <label for="languageSelect">🌐 Language / Язык:</label>
+    <select id="languageSelect">
+      <option value="substitution.html">English</option>
+      <option value="substitution-hebrew.html">עברית</option>
+      <option value="substitution-russian.html" selected>Русский</option>
+    </select>
+  </div>
+
+  <label for="inputText">Исходный текст:</label>
+  <textarea id="inputText" rows="4" placeholder="Введите сообщение..."></textarea>
+
+  <label>Ключ шифра (буква → буква):</label>
+    <div class="grid-rows">
+      <div class="grid-row" id="subGrid1"></div>
+      <div class="grid-row" id="subGrid2"></div>
+      <div class="grid-row" id="subGrid3"></div>
+    </div>
+
+
+  <div class="sub-controls">
+    <div class="caesar-group">
+      <label for="caesarShift">Сдвиг:</label>
+      <input type="number" id="caesarShift" min="0" max="32" value="3" />
+      <button id="applyCaesar">Цезарь</button>
+    </div>
+    <div class="caesar-group">
+      <label for="reverseShift">Сдвиг:</label>
+      <input type="number" id="reverseShift" min="0" max="32" value="0" />
+      <button id="applyReverse">Обратный алфавит</button>
+    </div>
+    <button id="randomizeBtn" class="side-button">🎲 Случайный ключ</button>
+  </div>
+
+  <label for="outputText">Зашифрованный текст:</label>
+  <textarea id="outputText" rows="4" readonly></textarea>
+	<div class="button-row">
+      <button onclick="goToDecoder()" class="side-btn">🔍 Страница расшифровки</button>
+	  <!--<button id="goToTools" class="side-btn">Substitution letter page Tools</button>-->
+	</div>
+  <script>
+    const letters = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'.split('');
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const inputs = {};
+
+    const subGrid1 = document.getElementById('subGrid1');
+    const subGrid2 = document.getElementById('subGrid2');
+    const subGrid3 = document.getElementById('subGrid3');
+
+    letters.forEach((letter, index) => {
+      const cell = document.createElement('div');
+      cell.className = 'sub-cell';
+
+      const label = document.createElement('label');
+      label.textContent = letter;
+
+      const input = document.createElement('input');
+      input.maxLength = 1;
+
+      inputs[letter] = input;
+      cell.appendChild(label);
+      cell.appendChild(input);
+
+      if (index < 11) {
+        subGrid1.appendChild(cell);
+      } else if (index < 22) {
+        subGrid2.appendChild(cell);
+      } else {
+        subGrid3.appendChild(cell);
+      }
+    });
+
+
+    function generateRandomKey() {
+      const shuffled = [...letters];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function fillRandomKey() {
+      const key = generateRandomKey();
+      for (let i = 0; i < letters.length; i++) {
+        inputs[letters[i]].value = key[i];
+      }
+      updateOutput();
+    }
+
+    function getSubstitutionMap() {
+      const map = {};
+      const used = {};
+      for (const letter of letters) {
+        const val = inputs[letter].value.toUpperCase();
+        inputs[letter].classList.remove('duplicate');
+
+        if (!val || val.length !== 1 || !letters.includes(val)) {
+          return null;
+        }
+
+        map[letter] = val;
+        if (!used[val]) used[val] = [];
+        used[val].push(letter);
+      }
+
+      for (const val in used) {
+        if (used[val].length > 1) {
+          for (const letter of used[val]) {
+            inputs[letter].classList.add('duplicate');
+          }
+          return null;
+        }
+      }
+
+      return map;
+    }
+
+    function encrypt(text, map) {
+      return text.split('').map(ch => map[ch.toUpperCase()] || ch).join('');
+    }
+
+    function updateOutput() {
+      const map = getSubstitutionMap();
+      const text = inputText.value;
+
+      if (map) {
+        outputText.value = encrypt(text, map);
+      } else {
+        outputText.value = '[Ошибка: неправильный ключ или повторения]';
+      }
+    }
+
+    function applyCaesarShift() {
+      const shift = parseInt(document.getElementById('caesarShift').value, 10) || 0;
+      for (let i = 0; i < letters.length; i++) {
+        const original = letters[i];
+        const shifted = letters[(i + shift) % letters.length];
+        inputs[original].value = shifted;
+      }
+      updateOutput();
+    }
+
+    function applyReverseShift() {
+      const shift = parseInt(document.getElementById('reverseShift').value, 10) || 0;
+      const reversed = [...letters].reverse();
+      const shifted = reversed.slice(shift).concat(reversed.slice(0, shift));
+      for (let i = 0; i < letters.length; i++) {
+        const original = letters[i];
+        inputs[original].value = shifted[i];
+      }
+      updateOutput();
+    }
+
+    inputText.addEventListener('input', updateOutput);
+    document.getElementById('randomizeBtn').addEventListener('click', fillRandomKey);
+    document.getElementById('applyCaesar').addEventListener('click', applyCaesarShift);
+    document.getElementById('applyReverse').addEventListener('click', applyReverseShift);
+    for (const input of Object.values(inputs)) {
+      input.addEventListener('input', updateOutput);
+    }
+
+    fillRandomKey();
+
+    // Language switcher
+    const languageSelect = document.getElementById("languageSelect");
+    languageSelect.addEventListener("change", () => {
+      window.location.href = languageSelect.value;
+    });
+    function goToDecoder() {
+      const output = document.getElementById("outputText").value.trim();
+      if (!output) return;
+      const url = `decode-helper-russian.html?text=${encodeURIComponent(output)}`;
+      window.location.href = url;
+    }
+
+  </script>
+
+</body>
+</html>

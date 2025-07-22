@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>הצפנת החלפה בא"ב עברי</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8150869065682337"
+     crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="caeser.html" class="nav-link" id="caesar-link">Caesar Cipher</a>
+      <a href="substitution.html" class="nav-link" id="substitution-link">Substitution Cipher</a>
+    </div>
+  </nav>
+
+  <h2>הצפנת החלפה בא"ב עברי</h2>
+    <div class="language-switcher">
+      <label for="languageSelect">🌐 שפה / Language:</label>
+      <select id="languageSelect">
+        <option value="substitution.html">English</option>
+        <option value="substitution-hebrew.html" selected>עברית</option>
+        <option value="substitution-russian.html" >Русский</option>
+      </select>
+    </div>
+
+  <label for="inputText">טקסט מקור:</label>
+  <textarea id="inputText" rows="4" placeholder="הכנס כאן את הטקסט שלך"></textarea>
+
+  <label>מפתח החלפה (אות מול אות):</label>
+
+  <div class="grid-rows">
+    <div class="grid-row" id="subGrid1"></div>
+    <div class="grid-row" id="subGrid2"></div>
+  </div>
+
+<div class="sub-controls">
+  <div class="control-groups">
+    <div class="caesar-group">
+      <label for="caesarShift">היסט:</label>
+      <input type="number" id="caesarShift" min="0" max="22" value="3" />
+      <button id="applyCaesar">שימוש בצופן קיסר</button>
+    </div>
+    <div class="caesar-group">
+      <label for="reverseShift">היסט:</label>
+      <input type="number" id="reverseShift" min="0" max="22" value="0" />
+      <button id="applyReverse">היפוך א"ב</button>
+    </div>
+  </div>
+
+  <button id="randomizeBtn" class="side-button">🎲 צור מפתח אקראי</button>
+</div>
+
+
+  <label for="outputText">טקסט מוצפן:</label>
+  <textarea id="outputText" rows="4" readonly></textarea>
+ <button id="goToBoxes" class="primary-btn">🔍 עמוד פענוח</button>
+ 
+  <script>
+    const letters = 'אבגדהוזחטיכלמנסעפצקרשת'.split('');
+    const subGrid1 = document.getElementById('subGrid1');
+    const subGrid2 = document.getElementById('subGrid2');
+    const inputText = document.getElementById('inputText');
+    const outputText = document.getElementById('outputText');
+    const inputs = {};
+
+    letters.forEach((letter, index) => {
+      const cell = document.createElement('div');
+      cell.className = 'sub-cell';
+
+      const label = document.createElement('label');
+      label.textContent = letter;
+
+      const input = document.createElement('input');
+      input.maxLength = 1;
+
+      inputs[letter] = input;
+      cell.appendChild(label);
+      cell.appendChild(input);
+
+      if (index < 11) {
+        subGrid1.appendChild(cell);
+      } else {
+        subGrid2.appendChild(cell);
+      }
+    });
+
+    function generateRandomKey() {
+      const shuffled = [...letters];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function fillRandomKey() {
+      const key = generateRandomKey();
+      for (let i = 0; i < letters.length; i++) {
+        inputs[letters[i]].value = key[i];
+      }
+      updateOutput();
+    }
+
+    function getSubstitutionMap() {
+      const map = {};
+      const used = {};
+      for (const letter of letters) {
+        const val = inputs[letter].value;
+        inputs[letter].classList.remove('duplicate');
+
+        if (!val || val.length !== 1 || !letters.includes(val)) {
+          return null;
+        }
+
+        map[letter] = val;
+        if (!used[val]) used[val] = [];
+        used[val].push(letter);
+      }
+
+      for (const val in used) {
+        if (used[val].length > 1) {
+          for (const letter of used[val]) {
+            inputs[letter].classList.add('duplicate');
+          }
+          return null;
+        }
+      }
+
+      return map;
+    }
+
+    function encrypt(text, map) {
+      return text.split('').map(ch => map[ch] || ch).join('');
+    }
+
+    function updateOutput() {
+      const map = getSubstitutionMap();
+      const text = inputText.value;
+      if (map) {
+        outputText.value = encrypt(text, map);
+      } else {
+        outputText.value = '[שגיאה: מפתח שגוי או כפול]';
+      }
+    }
+
+    function applyCaesarShift() {
+      const shift = parseInt(document.getElementById('caesarShift').value, 10) || 0;
+      for (let i = 0; i < letters.length; i++) {
+        const original = letters[i];
+        const shifted = letters[(i + shift) % letters.length];
+        inputs[original].value = shifted;
+      }
+      updateOutput();
+    }
+
+    function applyReverseShift() {
+      const shift = parseInt(document.getElementById('reverseShift').value, 10) || 0;
+      const reversed = [...letters].reverse();
+      const shifted = reversed.slice(shift).concat(reversed.slice(0, shift));
+      for (let i = 0; i < letters.length; i++) {
+        const original = letters[i];
+        inputs[original].value = shifted[i];
+      }
+      updateOutput();
+    }
+
+    inputText.addEventListener('input', updateOutput);
+    document.getElementById('randomizeBtn').addEventListener('click', fillRandomKey);
+    document.getElementById('applyCaesar').addEventListener('click', applyCaesarShift);
+    document.getElementById('applyReverse').addEventListener('click', applyReverseShift);
+    for (const input of Object.values(inputs)) {
+      input.addEventListener('input', updateOutput);
+    }
+    document.getElementById('goToBoxes').addEventListener('click', () => {
+      const subMap = getSubstitutionMap();
+      if (!subMap) {
+        alert('Please enter 26 unique valid letters (A–Z) in the substitution boxes.');
+        return;
+      }
+      const encrypted = encodeURIComponent(outputText.value);
+      window.location.href = `decode-helper-hebrew.html?text=${encrypted}`;
+    });
+    // Set selected language based on current page
+    const languageSelect = document.getElementById("languageSelect");
+    const currentPage = window.location.pathname.split("/").pop();
+    if (languageSelect) {
+      languageSelect.value = currentPage;
+
+      languageSelect.addEventListener("change", () => {
+        window.location.href = languageSelect.value;
+      });
+    }
+
+    fillRandomKey();
+  </script>
+</body>
+</html>

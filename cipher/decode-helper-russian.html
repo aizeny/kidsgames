@@ -1,25 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Manual Cipher Decoder</title>
+  <title>Ручная Расшифровка</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8150869065682337"
      crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="styles.css" />
   <style>
     body {
+      display: flex;
+      flex-direction: row;
+      gap: 40px;
       font-family: sans-serif;
       background: #f9f9ff;
       padding: 30px 20px;
       max-width: 1200px;
       margin: auto;
-      display: flex;
-      gap: 40px;
     }
 
     h1 {
-      color: #4e54c8;
-      margin: 0 0 20px;
       text-align: center;
+      color: #4e54c8;
+      margin-bottom: 20px;
       width: 100%;
     }
 
@@ -48,13 +50,12 @@
     }
 
     .alphabet-column .input-box {
-      width: 38px;
-      height: 38px;
+      width: 36px;
+      height: 36px;
       font-size: 18px;
       text-align: center;
       border: 1px solid #333;
       box-sizing: border-box;
-      text-transform: uppercase;
     }
 
     .cipher-display {
@@ -90,7 +91,6 @@
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
-      text-transform: uppercase;
       background: white;
       user-select: none;
     }
@@ -102,7 +102,6 @@
       text-align: center;
       border: 1px solid #333;
       box-sizing: border-box;
-      text-transform: uppercase;
     }
 
     .input-box-edit:focus {
@@ -111,7 +110,6 @@
 
     .propagated {
       background-color: #e2e2e2;
-      color: #000;
     }
 
     .btn-back {
@@ -119,25 +117,31 @@
       margin-top: 24px;
       font-weight: 600;
       font-size: 16px;
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 8px;
       text-decoration: none;
       background: linear-gradient(to right, #4e54c8, #8f94fb);
       color: white;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: background 0.3s ease;
     }
 
-    .btn-back:hover {
-      background: linear-gradient(to right, #3b40b0, #6e73db);
+    .share-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      background: #e0e3ff;
+      border: 1px solid #4e54c8;
+      color: #4e54c8;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
     }
 
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-        align-items: center;
-      }
+    .share-message {
+      font-size: 12px;
+      color: #4e54c8;
+      margin-top: 4px;
     }
+
     @media print {
       body {
         flex-direction: row;
@@ -150,21 +154,9 @@
 
       .btn-back,
       h1,
-      h2 {
+      .share-btn,
+      .share-message {
         display: none;
-      }
-
-      .alphabet-column {
-        position: relative;
-        margin: 0;
-        padding: 10px;
-        align-items: flex-start;
-      }
-
-      .main-container {
-        flex: 1;
-        padding: 10px;
-        margin: 0;
       }
 
       .letter-box,
@@ -179,63 +171,33 @@
         background-color: white !important;
       }
     }
-    .share-btn {
-      font-size: 12px;
-      padding: 4px 10px;
-      background: #e0e3ff;
-      border: 1px solid #4e54c8;
-      color: #4e54c8;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-bottom: 6px;
-      transition: background 0.2s ease;
-    }
-
-    .share-btn:hover {
-      background: #d4d7f7;
-    }
-
-    .share-message {
-      font-size: 13px;
-      color: #4e54c8;
-      margin-top: 4px;
-      animation: fadeout 2s forwards;
-    }
-
-    @keyframes fadeout {
-      0%   { opacity: 1; }
-      90%  { opacity: 1; }
-      100% { opacity: 0; display: none; }
-    }
-
   </style>
 </head>
 <body>
 
   <div class="alphabet-column" id="abcColumn">
-    <h2 style="margin: 0 0 16px;">Mapping</h2>
+    <h2>Буквы</h2>
   </div>
 
   <div class="main-container">
-    <h1>Manual Cipher Decoder   <button class="share-btn" onclick="copyPageLink()">🔗 Share</button>
-    <div id="shareMsg" class="share-message" style="display: none;">Link copied!</div></h1>
-    
+    <h1>Ручная Расшифровка</h1>
 
+    <button class="share-btn" onclick="copyPageLink()">🔗 Скопировать ссылку</button>
+    <div id="shareMsg" class="share-message" style="display: none;">✓ Ссылка скопирована</div>
 
     <div class="cipher-display" id="boxContainer"></div>
 
-    <a href="substitution.html" class="btn-back">← Back to Cipher Page</a>
+    <a href="substitution-russian.html" class="btn-back">← Назад к шифру</a>
   </div>
 
   <script>
-    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const letters = 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'.split('');
     const abcColumn = document.getElementById("abcColumn");
     const boxContainer = document.getElementById("boxContainer");
 
-    // Track all editable inputs by cipher letter
     const letterInputs = {};
 
-    // Create A–Z side column inputs
+    // Build side column A–Я
     letters.forEach(letter => {
       const row = document.createElement("div");
       row.className = "row";
@@ -247,8 +209,8 @@
       const input = document.createElement("input");
       input.className = "input-box";
       input.maxLength = 1;
-      input.dataset.source = "side";
       input.dataset.letter = letter;
+      input.dataset.source = "side";
 
       row.appendChild(label);
       row.appendChild(input);
@@ -258,7 +220,6 @@
       letterInputs[letter].push(input);
     });
 
-    // Read URL parameter
     const params = new URLSearchParams(window.location.search);
     const text = decodeURIComponent(params.get("text") || "").trim();
     const lines = text.split("\n");
@@ -302,14 +263,13 @@
       boxContainer.appendChild(lineWrapper);
     }
 
-    // Sync all inputs of the same letter
-   function updateLinkedInputs(sourceInput) {
+    // Sync guesses across same letters
+    function updateLinkedInputs(sourceInput) {
       const letter = sourceInput.dataset.letter;
       const value = sourceInput.value.toUpperCase();
 
       letterInputs[letter].forEach(input => {
         if (input === sourceInput) return;
-
         if (value === "") {
           input.value = "";
           input.classList.remove("propagated");
@@ -319,13 +279,9 @@
         }
       });
 
-      // Keep source field clean-looking
       sourceInput.classList.remove("propagated");
     }
 
-
-
-    // Attach event listeners to all inputs
     for (const inputs of Object.values(letterInputs)) {
       for (const input of inputs) {
         input.addEventListener("input", () => {
@@ -333,23 +289,17 @@
         });
       }
     }
+
     function copyPageLink() {
-  navigator.clipboard.writeText(window.location.href).then(() => {
-    const msg = document.getElementById("shareMsg");
-    msg.style.display = "inline";
-    msg.style.opacity = "1";
-
-    // Reset animation and hide after 2 seconds
-    msg.classList.remove("share-message"); // Reset animation
-    void msg.offsetWidth; // Trigger reflow
-    msg.classList.add("share-message");
-
-    setTimeout(() => {
-      msg.style.display = "none";
-    }, 2000);
-  });
-}
-
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        const msg = document.getElementById("shareMsg");
+        msg.style.display = "inline";
+        msg.style.opacity = "1";
+        setTimeout(() => {
+          msg.style.display = "none";
+        }, 2000);
+      });
+    }
   </script>
 
 </body>

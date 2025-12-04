@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Three-Piece Tic Tac Toe</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center h-screen bg-gray-100">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function ThreePieceTicTacToe() {
+      const empty = Array(9).fill(null);
+      const [board, setBoard] = React.useState(empty);
+      const [currentPlayer, setCurrentPlayer] = React.useState("X");
+      const [moves, setMoves] = React.useState({ X: [], O: [] });
+      const [winner, setWinner] = React.useState(null);
+
+      const winningLines = [
+        [0,1,2],
+        [3,4,5],
+        [6,7,8],
+        [0,3,6],
+        [1,4,7],
+        [2,5,8],
+        [0,4,8],
+        [2,4,6]
+      ];
+
+      // Check win after each move
+      const checkWinner = (board) => {
+        for (const [a, b, c] of winningLines) {
+          if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+            return board[a];
+          }
+        }
+        return null;
+      };
+
+      const handleClick = (index) => {
+        if (board[index] || winner) return;
+
+        const newBoard = [...board];
+        const newMoves = { X: [...moves.X], O: [...moves.O] };
+
+        // Add new move
+        newBoard[index] = currentPlayer;
+        newMoves[currentPlayer].push(index);
+
+        // Remove oldest if more than 3
+        if (newMoves[currentPlayer].length > 3) {
+          const removed = newMoves[currentPlayer].shift();
+          newBoard[removed] = null;
+        }
+
+        const maybeWinner = checkWinner(newBoard);
+        if (maybeWinner) {
+          setBoard(newBoard);
+          setMoves(newMoves);
+          setWinner(maybeWinner);
+          return;
+        }
+
+        setBoard(newBoard);
+        setMoves(newMoves);
+        setCurrentPlayer(currentPlayer === "X" ? "O" : "X");
+      };
+
+      const resetGame = () => {
+        setBoard(empty);
+        setMoves({ X: [], O: [] });
+        setCurrentPlayer("X");
+        setWinner(null);
+      };
+
+      return (
+        <div className="w-full flex flex-col items-center p-4">
+          <h1 className="text-2xl mb-4">Three-Piece Tic Tac Toe</h1>
+
+          <div className="grid grid-cols-3 gap-2 w-64 h-64">
+            {board.map((cell, index) => {
+              const player = cell;
+
+              // Fade only oldest piece of NON-current player
+              const isFading =
+                player &&
+                moves[player].length === 3 &&
+                player === currentPlayer &&
+                moves[player][0] === index;
+
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleClick(index)}
+                  className={
+                      "bg-white rounded-2xl shadow flex items-center justify-center text-4xl font-bold " +
+                      "w-20 h-20 " +                    // <-- fixed cell size added
+                      (isFading ? "text-gray-300" : "") +
+                      (winner ? " cursor-default" : "")
+                    }
+                >
+                  {cell}
+                </button>
+              );
+            })}
+          </div>
+
+          {!winner && (
+            <p className="mt-4 text-lg">
+              Turn: <span className="font-bold">{currentPlayer}</span>
+            </p>
+          )}
+
+          {winner && (
+            <div className="mt-4 text-xl font-bold text-green-600">
+              {winner} wins!
+            </div>
+          )}
+
+          <button
+            onClick={resetGame}
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-xl shadow"
+          >
+            Reset Game
+          </button>
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<ThreePieceTicTacToe />);
+  </script>
+</body>
+</html>
